@@ -1,0 +1,77 @@
+Option Compare Database
+Private Const ConnectionString = "Provider=SQLNCLI11.1;Integrated Security=SSPI;Pesist Security Info=False;Initial Catalog=CPS;Data Source='ENTER SOURCE"
+
+Private Sub btnupdate_Click()
+Dim code1 As String
+code1 = txtcode.Value
+
+DoCmd.OpenForm "crmacquisitionoffer ", , , "promocode = '" & code1 & "'"
+End Sub
+
+Private Sub btnverify_Click()
+Dim cmd As ADODB.Command
+Set cmd = New ADODB.Command
+'Dim ConnectionString As String
+
+Dim paramCodeID As ADODB.Parameter
+Dim paramUserID As ADODB.Parameter
+Dim strcode As String
+Dim strusername As String
+
+'Set conn = New ADODB.Connection
+'Dim conn As ADODB.Connection
+
+Dim rst As ADODB.Recordset
+
+strcode = txtpromocode
+stricorecontact = txtuser
+'MsgBox (strcode)
+'MsgBox (strusername)
+
+'paramCodeID.Value = strcode
+'paramUserID.Value = strusername
+
+'conn.Open ConnectionString
+
+With cmd
+    .ActiveConnection = ConnectionString
+    .CommandText = "getverifycrmpromocode"
+    .CommandType = adCmdStoredProc
+Set paramCodeID = .CreateParameter("@promocode", adVarChar, adParamInput, 50, strcode)
+    .Parameters.Append paramCodeID
+Set paramUserID = .CreateParameter("@phonenumber", adVarChar, adParamInput, 255, stricorecontact)
+    .Parameters.Append paramUserID
+Set rst = .Execute
+
+End With
+Dim valuecheck As String
+
+Do Until rst.EOF
+    valuecheck = (rst("result"))
+    'MsgBox (valuecheck)
+    rst.MoveNext
+Loop
+
+If valuecheck = "NUMBER AND CODE MATCH" Then
+MsgBox ("PromoCode and Number Matched. Kindly issue the bonus")
+Else
+MsgBox ("Incorrect Information was registered")
+End If
+
+ Set rst = Nothing
+ Set cmd = Nothing
+ 
+    
+'    .Parameters.Append .CreateParameter("@username", nvarchar, adParamInput, 255, strusername)
+'cmd.Parameters("@promo").Value = txtvalue.Text
+'cmd.Parameters("@username").Value = Text.Text
+'If rst.EOF Then
+'    MsgBox ("no value")
+'Else
+'    MsgBox (rst("title"))
+'End If
+
+
+
+
+End Sub
